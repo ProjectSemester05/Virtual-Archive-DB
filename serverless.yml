@@ -1,0 +1,58 @@
+service: virtual-archive-db
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: us-east-1
+  lambdaHashingVersion: 20201221
+  environment:
+    tableName: ${self:custom.tableName}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource: '*'
+
+plugins:
+  - serverless-webpack
+
+package:
+  individually: true
+
+custom:
+  tableName: catalogues
+
+functions:
+  getCatalogue:
+    handler: ./app/dbActions/getCatalogue.handler
+    description: Get catalogue by ID
+    events:
+      - http:
+          path: catalogue/{ID}
+          method: GET
+          cors: true
+  createCatalogue:
+    handler: ./app/dbActions/createCatalogue.handler
+    description: Create a new catalogue
+    events:
+      - http:
+          path: catalogue/new/{ID}
+          method: POST
+          cors: true
+
+resources:
+  Resources:
+    CatalogueTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tableName}
+        AttributeDefinitions:
+          - AttributeName: ID
+            AttributeType: S
+        KeySchema:
+          - AttributeName: ID
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+

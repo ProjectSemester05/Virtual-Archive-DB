@@ -1,0 +1,14 @@
+{
+  "name": "Virtual Archive DB",
+  "version": "1.0.0",
+  "dependencies": {
+    "bluebird": "^3.7.2",
+    "serverless-webpack": "^5.5.4",
+    "webpack": "^5.52.0"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.982.0",
+    "serverless-s3-sync": "^1.17.1",
+    "uuid": "^8.3.2"
+  }
+}
