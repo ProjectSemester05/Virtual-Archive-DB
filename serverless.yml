@@ -7,7 +7,10 @@ provider:
   region: us-east-1
   lambdaHashingVersion: 20201221
   environment:
-    tableName: ${self:custom.tableName}
+    userTableName: ${self:custom.userTableName}
+    catalogueTableName: ${self:custom.catalogueTableName}
+    itemTableName: ${self:custom.itemTableName}
+    reminderTableName: ${self:custom.reminderTableName}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -21,38 +24,174 @@ package:
   individually: true
 
 custom:
-  tableName: catalogues
+  userTableName: users
+  catalogueTableName: catalogues
+  itemTableName: items
+  reminderTableName: reminders
 
 functions:
   getCatalogue:
-    handler: ./app/dbActions/getCatalogue.handler
-    description: Get catalogue by ID
+    handler: ./app/Endpoints/Catalogue/getCatalogue.handler
+    description: Get catalogue by UUID
     events:
       - http:
-          path: catalogue/{ID}
+          path: catalogue/{UUID}
+          method: GET
+          cors: true
+  getCatalogueByName:
+    handler: ./app/Endpoints/Catalogue/getCatalogueByName.handler
+    description: Get catalogue by Name
+    events:
+      - http:
+          path: catalogue-by-name/{CatalogueName}
           method: GET
           cors: true
   createCatalogue:
-    handler: ./app/dbActions/createCatalogue.handler
+    handler: ./app/Endpoints/Catalogue/createCatalogue.handler
     description: Create a new catalogue
     events:
       - http:
-          path: catalogue/new/{ID}
+          path: catalogue/new
+          method: POST
+          cors: true
+  getUser:
+    handler: ./app/Endpoints/User/getUser.handler
+    description: Get user by UUID
+    events:
+      - http:
+          path: user/{UUID}
+          method: GET
+          cors: true
+  createUser:
+    handler: ./app/Endpoints/User/createUser.handler
+    description: Create a new user
+    events:
+      - http:
+          path: user/new
+          method: POST
+          cors: true
+  getItem:
+    handler: ./app/Endpoints/Item/getItem.handler
+    description: Get item by UUID
+    events:
+      - http:
+          path: item/{UUID}
+          method: GET
+          cors: true
+  createItem:
+    handler: ./app/Endpoints/Item/createItem.handler
+    description: Create a new item
+    events:
+      - http:
+          path: item/new
+          method: POST
+          cors: true
+  getItemByName:
+    handler: ./app/Endpoints/Item/getItemByName.handler
+    description: Get item by Name
+    events:
+      - http:
+          path: item-by-name/{ItemName}
+          method: GET
+          cors: true
+  getItemByCatalogueUUID:
+    handler: ./app/Endpoints/Item/getItemByCatalogueID.handler
+    description: Get item by CatalogueUUID
+    events:
+      - http:
+          path: item-by-catalogue-uuid/{CatalogueUUID}
+          method: GET
+          cors: true
+  getReminder:
+    handler: ./app/Endpoints/Reminder/getReminder.handler
+    description: Get reminder by UUID
+    events:
+      - http:
+          path: reminder/{UUID}
+          method: GET
+          cors: true
+  createReminder:
+    handler: ./app/Endpoints/Reminder/createReminder.handler
+    description: Create a new reminder
+    events:
+      - http:
+          path: reminder/new
           method: POST
           cors: true
 
+
 resources:
   Resources:
+    UserTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.userTableName}
+        AttributeDefinitions:
+          - AttributeName: UUID
+            AttributeType: S
+        KeySchema:
+          - AttributeName: UUID
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
     CatalogueTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:custom.tableName}
+        TableName: ${self:custom.catalogueTableName}
         AttributeDefinitions:
-          - AttributeName: ID
+          - AttributeName: UUID
+            AttributeType: S
+          - AttributeName: CatalogueName
             AttributeType: S
         KeySchema:
-          - AttributeName: ID
+          - AttributeName: UUID
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
+        GlobalSecondaryIndexes:
+          - IndexName: catalogue-name-index
+            KeySchema:
+              - AttributeName: CatalogueName
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+    ItemTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.itemTableName}
+        AttributeDefinitions:
+          - AttributeName: UUID
+            AttributeType: S
+          - AttributeName: ItemName
+            AttributeType: S
+          - AttributeName: CatalogueUUID
+            AttributeType: S
+        KeySchema:
+          - AttributeName: UUID
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        GlobalSecondaryIndexes:
+          - IndexName: item-name-index
+            KeySchema:
+              - AttributeName: ItemName
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: catalogue-uuid-index
+            KeySchema:
+              - AttributeName: CatalogueUUID
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+    ReminderTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.reminderTableName}
+        AttributeDefinitions:
+          - AttributeName: UUID
+            AttributeType: S
+        KeySchema:
+          - AttributeName: UUID
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
 
 

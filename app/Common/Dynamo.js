@@ -4,18 +4,18 @@ const {target} = require("../../webpack.config");
 const documentClient = new AWS.DynamoDB.DocumentClient();
 
 const Dynamo = {
-    async get(ID, TableName) {
+    async get(UUID, TableName) {
         const params = {
             TableName,
             Key: {
-                ID,
+                UUID,
             },
         };
 
         const data = await documentClient.get(params).promise();
 
         if (!data || !data.Item) {
-            throw Error(`There was an error fetching the data for ID of ${ID} from ${TableName}`);
+            throw Error(`There was an error fetching the data for UUID of ${UUID} from ${TableName}`);
         }
         console.log(data);
 
@@ -23,8 +23,8 @@ const Dynamo = {
     },
 
     async write(data, TableName) {
-        if (!data.ID){
-            throw Error("No ID on the data")
+        if (!data.UUID) {
+            throw Error("No UUID on the data")
         }
 
         const params = {
@@ -34,14 +34,30 @@ const Dynamo = {
 
         const res = await documentClient.put(params).promise();
 
-        if (!res){
-            throw Error(`There was an error inserting ID of the ${data.ID} in the ${TableName}`)
+        if (!res) {
+            throw Error(`There was an error inserting UUID of the ${data.UUID} in the ${TableName}`)
         }
 
         return data;
     },
 
     // async update(data)
+
+    query: async ({tableName, index, queryKey, queryValue}) => {
+        const params = {
+            TableName: tableName,
+            IndexName: index,
+            KeyConditionExpression: `${queryKey} = :hkey`,
+            ExpressionAttributeValues: {
+                ':hkey': queryValue
+            }
+        };
+
+        const res = await documentClient.query(params).promise();
+
+        return res.Items || [];
+    }
+
 };
 
 module.exports = Dynamo
