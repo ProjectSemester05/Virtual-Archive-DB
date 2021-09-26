@@ -2,7 +2,9 @@ const Responses = {
     _200(data = {}){
         return {
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": true,
             },
             statusCode: 200,
             body: JSON.stringify(data)
@@ -12,7 +14,9 @@ const Responses = {
     _400(data = {}){
         return {
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": true,
             },
             statusCode: 400,
             body: JSON.stringify(data)
