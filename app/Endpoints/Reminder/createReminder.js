@@ -13,6 +13,14 @@ exports.handler = async event => {
 
     reminder.UUID = ID
 
+    if (!event.headers || !event.headers.userid){
+        return Responses._400({message: 'missing header UserID'})
+    }
+
+    const UserID = event.headers.userid
+
+    reminder.UserID = UserID
+
     const newReminder = await Dynamo.write(reminder, tableName).catch(err => {
         console.log("Error in dynamo write", err)
         return null;

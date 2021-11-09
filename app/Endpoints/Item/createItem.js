@@ -13,6 +13,14 @@ exports.handler = async event => {
 
     item.UUID = ID
 
+    if (!event.headers || !event.headers.userid){
+        return Responses._400({message: 'missing header UserID'})
+    }
+
+    const UserID = event.headers.userid
+
+    item.UserID = UserID;
+
     console.log("========================",item);
 
     const newItem = await Dynamo.write(item, tableName).catch(err => {

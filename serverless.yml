@@ -37,9 +37,9 @@ functions:
       - http:
           path: catalogue/{UUID}
           method: GET
-          cors: true
-          authorizer:
-            arn:  arn:aws:cognito-idp:us-east-1:761159918860:userpool/us-east-1_u4xLpJKI8
+          cors:
+            origin: '*'
+            headers: '*'
   getCatalogueByName:
     handler: ./app/Endpoints/Catalogue/getCatalogueByName.handler
     description: Get catalogue by Name
@@ -47,7 +47,29 @@ functions:
       - http:
           path: catalogue-by-name/{CatalogueName}
           method: GET
-          cors: true
+          cors:
+            origin: '*'
+            headers: '*'
+  deleteCatalogue:
+    handler: ./app/Endpoints/Catalogue/deleteCatalogue.handler
+    description: delete catalogue by UUID
+    events:
+      - http:
+          path: catalogue/{UUID}
+          method: DELETE
+          cors:
+            origin: '*'
+            headers: '*'
+  getCatalogueByUserID:
+    handler: ./app/Endpoints/Catalogue/getCataloguesByUserID.handler
+    description: Get catalogue by User ID
+    events:
+      - http:
+          path: catalogue-by-user
+          method: GET
+          cors:
+            origin: '*'
+            headers: '*'
   createCatalogue:
     handler: ./app/Endpoints/Catalogue/createCatalogue.handler
     description: Create a new catalogue
@@ -55,25 +77,29 @@ functions:
       - http:
           path: catalogue/new
           method: POST
-          cors: true
-          authorizer:
-            arn:  arn:aws:cognito-idp:us-east-1:761159918860:userpool/us-east-1_u4xLpJKI8
-  getUser:
-    handler: ./app/Endpoints/User/getUser.handler
-    description: Get user by UUID
+          cors:
+            origin: '*'
+            headers: '*'
+  getChildCatalogues:
+    handler: ./app/Endpoints/Catalogue/getChildCatalogues.handler
+    description: Get catalogue by User ID
     events:
       - http:
-          path: user/{UUID}
+          path: child-catalogue/{ParentCatalogueUUID}
           method: GET
-          cors: true
-  createUser:
-    handler: ./app/Endpoints/User/createUser.handler
-    description: Create a new user
+          cors:
+            origin: '*'
+            headers: '*'
+  updateCatalogue:
+    handler: ./app/Endpoints/Catalogue/updateCatalogue.handler
+    description: update catalogue
     events:
       - http:
-          path: user/new
-          method: POST
-          cors: true
+          path: catalogue/edit
+          method: PUT
+          cors:
+            origin: '*'
+            headers: '*'
   getItem:
     handler: ./app/Endpoints/Item/getItem.handler
     description: Get item by UUID
@@ -81,7 +107,9 @@ functions:
       - http:
           path: item/{UUID}
           method: GET
-          cors: true
+          cors:
+            origin: '*'
+            headers: '*'
   createItem:
     handler: ./app/Endpoints/Item/createItem.handler
     description: Create a new item
@@ -89,7 +117,29 @@ functions:
       - http:
           path: item/new
           method: POST
-          cors: true
+          cors:
+            origin: '*'
+            headers: '*'
+  updateItem:
+    handler: ./app/Endpoints/Item/updateItem.handler
+    description: Update item
+    events:
+      - http:
+          path: item/edit
+          method: PUT
+          cors:
+            origin: '*'
+            headers: '*'
+  deleteitem:
+    handler: ./app/Endpoints/Item/deleteItem.handler
+    description: delete catalogue by UUID
+    events:
+      - http:
+          path: item/{UUID}
+          method: DELETE
+          cors:
+            origin: '*'
+            headers: '*'
   getItemByName:
     handler: ./app/Endpoints/Item/getItemByName.handler
     description: Get item by Name
@@ -97,7 +147,9 @@ functions:
       - http:
           path: item-by-name/{ItemName}
           method: GET
-          cors: true
+          cors:
+            origin: '*'
+            headers: '*'
   getItemByCatalogueUUID:
     handler: ./app/Endpoints/Item/getItemByCatalogueID.handler
     description: Get item by CatalogueUUID
@@ -105,7 +157,29 @@ functions:
       - http:
           path: item-by-catalogue-uuid/{CatalogueUUID}
           method: GET
-          cors: true
+          cors:
+            origin: '*'
+            headers: '*'
+  getDescriptionOfItem:
+    handler: ./app/Endpoints/Item/getDescription.handler
+    description: Get description by catalogue and item names
+    events:
+      - http:
+          path: item-description/{CatalogueName}/{ItemName}
+          method: GET
+          cors:
+            origin: '*'
+            headers: '*'
+  getUuidOfItem:
+    handler: ./app/Endpoints/Item/getItemUuid.handler
+    description: Get uuid by catalogue and item names
+    events:
+      - http:
+          path: item-uuid/{CatalogueName}/{ItemName}
+          method: GET
+          cors:
+            origin: '*'
+            headers: '*'
   getReminder:
     handler: ./app/Endpoints/Reminder/getReminder.handler
     description: Get reminder by UUID
@@ -113,7 +187,9 @@ functions:
       - http:
           path: reminder/{UUID}
           method: GET
-          cors: true
+          cors:
+            origin: '*'
+            headers: '*'
   createReminder:
     handler: ./app/Endpoints/Reminder/createReminder.handler
     description: Create a new reminder
@@ -121,40 +197,102 @@ functions:
       - http:
           path: reminder/new
           method: POST
-          cors: true
-
+          cors:
+            origin: '*'
+            headers: '*'
+  getReminderByItemID:
+    handler: ./app/Endpoints/Reminder/getReminderByItem.handler
+    description: Get reminder by Item UUID
+    events:
+      - http:
+          path: reminder-by-item/{ItemUUID}
+          method: GET
+          cors:
+            origin: '*'
+            headers: '*'
+  getReminderByDate:
+    handler: ./app/Endpoints/Reminder/getRemindersByDate.handler
+    description: Get reminder by Date
+    events:
+      - http:
+          path: reminder-by-date/{ReminderDate}
+          method: GET
+          cors:
+            origin: '*'
+            headers: '*'
+  getReminderByUser:
+    handler: ./app/Endpoints/Reminder/getReminderByUser.handler
+    description: Get reminder by User
+    events:
+      - http:
+          path: reminder-by-user
+          method: GET
+          cors:
+            origin: '*'
+            headers: '*'
+  deleteReminder:
+    handler: ./app/Endpoints/Reminder/deleteReminder.handler
+    description: Delete reminder by UUID
+    events:
+      - http:
+          path: reminder/{UUID}
+          method: DELETE
+          cors:
+            origin: '*'
+            headers: '*'
+  updateReminder:
+    handler: ./app/Endpoints/Reminder/updateReminder.handler
+    description: update reminder
+    events:
+      - http:
+          path: reminder/edit
+          method: PUT
+          cors:
+            origin: '*'
+            headers: '*'
 
 resources:
   Resources:
-    UserTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:custom.userTableName}
-        AttributeDefinitions:
-          - AttributeName: UUID
-            AttributeType: S
-        KeySchema:
-          - AttributeName: UUID
-            KeyType: HASH
-        BillingMode: PAY_PER_REQUEST
     CatalogueTable:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ${self:custom.catalogueTableName}
         AttributeDefinitions:
+          - AttributeName: UserID
+            AttributeType: S
           - AttributeName: UUID
             AttributeType: S
           - AttributeName: CatalogueName
             AttributeType: S
+          - AttributeName: ParentCatalogueUUID
+            AttributeType: S
         KeySchema:
-          - AttributeName: UUID
+          - AttributeName: UserID
             KeyType: HASH
+          - AttributeName: UUID
+            KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
         GlobalSecondaryIndexes:
           - IndexName: catalogue-name-index
             KeySchema:
-              - AttributeName: CatalogueName
+              - AttributeName: UserID
                 KeyType: HASH
+              - AttributeName: CatalogueName
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: user-id-index
+            KeySchema:
+              - AttributeName: UserID
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: parent-uuid-index
+            KeySchema:
+              - AttributeName: UserID
+                KeyType: HASH
+              - AttributeName: ParentCatalogueUUID
+                KeyType: RANGE
             Projection:
               ProjectionType: ALL
     ItemTable:
@@ -168,21 +306,35 @@ resources:
             AttributeType: S
           - AttributeName: CatalogueUUID
             AttributeType: S
+          - AttributeName: UserID
+            AttributeType: S
         KeySchema:
-          - AttributeName: UUID
+          - AttributeName: UserID
             KeyType: HASH
+          - AttributeName: UUID
+            KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
         GlobalSecondaryIndexes:
           - IndexName: item-name-index
             KeySchema:
-              - AttributeName: ItemName
+              - AttributeName: UserID
                 KeyType: HASH
+              - AttributeName: ItemName
+                KeyType: RANGE
             Projection:
               ProjectionType: ALL
           - IndexName: catalogue-uuid-index
             KeySchema:
-              - AttributeName: CatalogueUUID
+              - AttributeName: UserID
                 KeyType: HASH
+              - AttributeName: CatalogueUUID
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: user-id-index
+            KeySchema:
+                - AttributeName: UserID
+                  KeyType: HASH
             Projection:
               ProjectionType: ALL
     ReminderTable:
@@ -192,11 +344,41 @@ resources:
         AttributeDefinitions:
           - AttributeName: UUID
             AttributeType: S
+          - AttributeName: ReminderDate
+            AttributeType: S
+          - AttributeName: UserID
+            AttributeType: S
+          - AttributeName: ItemUUID
+            AttributeType: S
         KeySchema:
-          - AttributeName: UUID
+          - AttributeName: UserID
             KeyType: HASH
+          - AttributeName: UUID
+            KeyType: RANGE
         BillingMode: PAY_PER_REQUEST
-
+        GlobalSecondaryIndexes:
+          - IndexName: reminder-date-index
+            KeySchema:
+              - AttributeName: UserID
+                KeyType: HASH
+              - AttributeName: ReminderDate
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: reminder-user-id-index
+            KeySchema:
+              - AttributeName: UserID
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: reminder-item-id-index
+            KeySchema:
+              - AttributeName: UserID
+                KeyType: HASH
+              - AttributeName: ItemUUID
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
 
 
 

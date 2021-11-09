@@ -7,15 +7,28 @@ const tableName = process.env.catalogueTableName
 exports.handler = async event => {
     console.log('event',event)
 
+    if (!event.headers || !event.headers.userid){
+        return Responses._400({message: 'missing header UserID'})
+    }
+
+    const UserID = event.headers.userid
+
     let ID = uuidv4();
 
     const catalogue = JSON.parse(event.body);
 
-    catalogue.UUID = ID
+    catalogue.UUID = ID;
+    catalogue.UserID = UserID;
 
     // catalogue.CatalogueName = catalogue.CatalogueName.replace(/ /g, '-')
 
-    console.log("========================",catalogue);
+    const catalogueName = catalogue.CatalogueName;
+
+    const catalogueExist = await Dynamo.getCatalogueByName(catalogueName, UserID);
+
+    if (!catalogueExist || catalogueExist.length !== 0){
+        return Responses._400({message: 'Name Already Exist'})
+    }
 
     const newCatalogue = await Dynamo.write(catalogue, tableName).catch(err => {
         console.log("Error in dynamo write", err)

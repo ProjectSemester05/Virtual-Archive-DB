@@ -12,7 +12,13 @@ exports.handler = async event => {
 
     let UUID = event.pathParameters.UUID
 
-    const catalogue = await Dynamo.get(UUID, tableName).catch(err => {
+    if (!event.headers || !event.headers.userid){
+        return Responses._400({message: 'missing header UserID'})
+    }
+
+    const UserID = event.headers.userid
+
+    const catalogue = await Dynamo.get(UUID, UserID, tableName).catch(err => {
         console.log("Error in Dynamo Get", err);
         return null
     })
